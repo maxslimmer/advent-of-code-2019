@@ -1,24 +1,28 @@
-def get_nodes_on_wire(wire):
+def get_nodes_from_path(path):
     nodes = [(0, 0)]
 
-    for vector in wire:
-        direction, mag = vector[0], int(vector[1:])
-        section = []
-        x, y = nodes[-1]
-        for _ in range(mag):
+    for vector in path:
+        nodes.extend(get_nodes_from_vector(vector, nodes[-1]))
 
-            if direction == "R":
-                x += 1
-            elif direction == "L":
-                x -= 1
-            elif direction == "U":
-                y += 1
-            elif direction == "D":
-                y -= 1
+    return nodes
 
-            section.append((x, y))
 
-        nodes.extend(section)
+def get_nodes_from_vector(vector, start_node=(0, 0)):
+    nodes = []
+    x, y = start_node
+    direction, mag = vector[0], int(vector[1:])
+    for _ in range(mag):
+
+        if direction == "R":
+            x += 1
+        elif direction == "L":
+            x -= 1
+        elif direction == "U":
+            y += 1
+        elif direction == "D":
+            y -= 1
+
+        nodes.append((x, y))
     return nodes
 
 
@@ -36,21 +40,17 @@ def get_step_distance(node, wire):
     return wire.index(node)
 
 
-# read input
 with open("input.txt", "r") as input_file:
-    wires = list(line.strip().split(",") for line in input_file)
+    wires = [get_nodes_from_path(line.strip().split(",")) for line in input_file]
 
-# process data
-wires_as_nodes = [get_nodes_on_wire(wire) for wire in wires]
-intersections = find_intersections(*wires_as_nodes)
+intersections = find_intersections(*wires)
 min_man_dist = min(
     get_manhattan_distance(intersection)
     for intersection in intersections
     if intersection != (0, 0)
 )
 mid_step_dist = min(
-    get_step_distance(node, wires_as_nodes[0])
-    + get_step_distance(node, wires_as_nodes[1])
+    get_step_distance(node, wires[0]) + get_step_distance(node, wires[1])
     for node in intersections
     if node != (0, 0)
 )
