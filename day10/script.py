@@ -38,16 +38,19 @@ def find_distance(a, b):
     x, y = (a[0] - b[0], a[1] - b[1])
     return sqrt(x**2 + y**2)
 
+def gcd(a, b):
+    if 0 in (a, b):
+        return a or b
+    return gcd(b, a % b)
+
 def find_direction(a, b):
     """Return the direction of a vector as tuple (direction, magnitude)."""
     # Find common factors
     x, y = (a[0] - b[0], a[1] - b[1])
-    smaller = min(abs(x), abs(y))
-    if smaller == 0:
+    if 0 in (x, y):
         return (x and (x // abs(x)), y and y // abs(y))
-    for f in range(smaller, 0, -1):
-        if x % f == 0 and y % f == 0:
-            return (x // f, y // f)
+    f = gcd(x, y)
+    return (x // f, y // f)
 
 if __name__ == "__main__":
     main()
